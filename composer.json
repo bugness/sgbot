@@ -1,0 +1,12 @@
+{
+    "name": "bugness/sgbot",
+    "license": "MIT",
+    "type": "project",
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/console": "~2.3"
+    },
+    "autoload": {
+        "psr-0": { "": "src/" }
+    }
+}
