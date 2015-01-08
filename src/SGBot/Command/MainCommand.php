@@ -16,13 +16,14 @@ class MainCommand extends Command
     {
         $this
             ->setName('app:exec')
+            ->setDescription('Run application')
             ->addArgument('config', InputArgument::REQUIRED)
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $file = $input->getArgument('config');
+        $file = realpath($input->getArgument('config'));
         if (!file_exists($file)) {
             $output->writeln("File '{$file}' not found");
             return;
@@ -43,11 +44,11 @@ class MainCommand extends Command
             return;
         }
 
-        array_unshift($result, '----', date('d M Y H:i:s'));
+        array_unshift($result, '---', date('d M Y H:i:s'));
 
         file_put_contents(
-            APP_PATH . DIRECTORY_SEPARATOR . $config['username'] . '.log',
-            join(PHP_EOL, $result),
+            $config['username'] . '.log',
+            join(PHP_EOL, $result) . PHP_EOL,
             FILE_APPEND
         );
     }

@@ -1,8 +1,5 @@
 composer.lock
 composer.phar
-app/phpunit.xml
-app/config.*.yml
-!app/config.sample.yml
-app/*.log
 vendor/
+build/
 
