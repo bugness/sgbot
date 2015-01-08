@@ -1,21 +1,15 @@
 #SGBot
 
-====
-
 ##Installation:
 
---
-
 ```
-git clone https://github.com/bugness/sgbot.git
+> git clone https://github.com/bugness/sgbot.git
 
-curl -sS https://getcomposer.org/installer | php
+> curl -sS https://getcomposer.org/installer | php
+> composer install
 
-composer install
+> cp app/config.sample.yml app/config.your-name.yml
+> chmod +x app/console
 
-cp app/config.sample.yml app/config.your-name.yml
-
-chmod +x app/console
-
-app/console app:exec app/config.your-name.yml
+> app/console app:exec app/config.your-name.yml
 ```
