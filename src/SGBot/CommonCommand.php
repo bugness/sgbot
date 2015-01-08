@@ -3,33 +3,34 @@
 namespace SGBot;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Yaml\Parser;
 use Guzzle\Http\Client;
 use Symfony\Component\DomCrawler\Crawler;
 
 class CommonCommand extends Command
 {
+    protected $config;
+
     protected function configure()
     {
-        $this->setName('common:test');
+        $this
+            ->setName('app:exec')
+            ->addArgument('config', InputArgument::REQUIRED, 'Config File')
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $wishlist = array(
-            'Hydrophobia: Prophecy',
-            'Borderlands 2',
-            'Gumboy Tournament',
-            'Serious Sam 2',
-            '1953 - KGB Unleashed'
-        );
+        $yaml = new Parser;
+        $this->config = $yaml->parse(file_get_contents($input->getArgument('config')));
+        $wishlist = $this->config['wishList'];
 
         $client = new Client('http://www.steamgifts.com');
 
-        $output->writeln('-----------------------');
-
-        $crawler = $this->_getCrawlerByLink($client, '/');
+        $crawler = $this->getCrawlerByLink($client, '/');
         $links = array_filter($crawler
             ->filter('div.post:not(.fade) > div.left > div.title > a')
             ->each(function (Crawler $node, $i) use ($wishlist) {
@@ -37,44 +38,37 @@ class CommonCommand extends Command
                     ? $node->attr('href') : null;
             }
         ));
-        $output->writeln(join(PHP_EOL, $links));
-
-        $output->writeln('-----------------------');
 
         foreach ($links as $link) {
-            $crawler = $this->_getCrawlerByLink($client, $link);
+            $crawler = $this->getCrawlerByLink($client, $link);
             if (count($crawler->filter('a.submit_entry'))) {
-                $output->writeln($link . ' - ' . $this->_submitForm($client, $link));
+                $output->writeln($link . ' - ' . $this->submitForm($client, $link));
             }
         }
-
-        $output->writeln('-----------------------');
     }
 
-    protected function _getCrawlerByLink($client, $link)
+    protected function getCrawlerByLink($client, $link)
     {
         $request = $client->get($link);
-        $this->_fillHeaders($request);
+        $this->fillHeaders($request);
         $response = $request->send();
         return new Crawler($response->getBody(true));
     }
 
-    protected function _submitForm($client, $link)
+    protected function submitForm($client, $link)
     {
         $request = $client->post($link, null, [
-            'form_key'       => '',
+            'form_key'       => $this->config['formKey'],
             'enter_giveaway' => '1'
         ]);
-        $this->_fillHeaders($request);
+        $this->fillHeaders($request);
         $response = $request->send();
         return $response->getStatusCode();
     }
 
-    protected function _fillHeaders($request)
+    protected function fillHeaders($request)
     {
-        $request->addCookie('PHPSESSID', '');
-        $request->addHeaders([
-            'User-Agent' => 'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:28.0) Gecko/20100101 Firefox/28.0'
-        ]);
+        $request->addCookie('PHPSESSID', $this->config['sessionId']);
+        $request->addHeaders(['User-Agent' => $this->config['userAgent']]);
     }
 }
