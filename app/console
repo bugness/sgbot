@@ -4,13 +4,18 @@
 // set to run indefinitely if needed
 set_time_limit(0);
 
+define('APP_PATH', __DIR__);
+
 // include the composer autoloader
 require_once __DIR__ . '/../vendor/autoload.php'; 
 
 // import the Symfony Console Application 
 use Symfony\Component\Console\Application;
-use SGBot\CommonCommand;
+use SGBot\Command;
 
 $app = new Application('SGBot', '1.0');
-$app->add(new CommonCommand);
+$app->addCommands([
+    new Command\MainCommand,
+    new Command\ReportCommand,
+]);
 $app->run();
