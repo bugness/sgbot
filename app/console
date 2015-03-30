@@ -7,7 +7,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use Symfony\Component\Console\Application;
 use SGBot\Command;
 
-$app = new Application('SGBot', '1.0');
+$app = new Application('SGBot', '2.0');
 $app->addCommands([
     new Command\MainCommand,
     new Command\ReportCommand,

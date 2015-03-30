@@ -9,7 +9,7 @@
 > composer install
 
 > cp app/config.sample.yml app/config.your-name.yml
-> chmod +x app/console
+> php app/builder.php
 
-> app/console app:exec app/config.your-name.yml
+> ./sgbot.phar app:exec app/config.your-name.yml
 ```

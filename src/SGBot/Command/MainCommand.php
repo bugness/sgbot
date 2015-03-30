@@ -38,7 +38,11 @@ class MainCommand extends Command
         }
 
         $provider = new Provider($config);
-        $result = $provider->enterToGiveaways();
+        try {
+            $result = $provider->enterToGiveaways();
+        } catch (\Exception $e) {
+            $result = [$e->getMessage()];
+        }
 
         if (!count($result)) {
             return;
