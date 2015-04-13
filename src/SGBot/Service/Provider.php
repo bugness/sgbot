@@ -14,15 +14,38 @@ class Provider
         $this->config = $config;
     }
 
-    public function enterToGiveaways()
+    public function enterToGiveaways($fullScan = false)
+    {
+        $client = new Client('http://www.steamgifts.com');
+        $logs   = [];
+        $page   = 1;
+
+        do {
+            $result = $this->processPage($client, $page++);
+            $logs = array_merge($logs, $result['logs']);
+        } while ($fullScan && $result['continue']);
+
+        return $logs;
+    }
+
+    protected function processPage($client, $page)
     {
         $wishlist = $this->config['wishList'];
+        $continue = true;
 
-        $client = new Client('http://www.steamgifts.com');
         try {
-            $crawler = $this->getCrawlerByLink($client, '/');
+            $crawler = $this->getCrawlerByLink($client, '/giveaways/search?page=' . $page);
         } catch (\Exception $e) {
             throw new \Exception('An error occured. Please check SessionID.');
+        }
+
+        $pages = $crawler
+            ->filter('div.pagination__navigation > a')
+            ->last()
+            ->attr('data-page-number')
+        ;
+        if ($page >= $pages) {
+            $continue = false;
         }
 
         $points = $crawler->filter('span.nav__points');
@@ -49,8 +72,7 @@ class Provider
             )
         );
 
-        $result = [];
-
+        $logs = [];
         foreach ($links as $link) {
             $crawler = $this->getCrawlerByLink($client, $link);
             $sidebar = $crawler->filter('div.sidebar.sidebar--wide');
@@ -67,14 +89,20 @@ class Provider
                     'do'         => 'entry_insert',
                 ]);
                 $title = $crawler->filter('div.featured__heading')->first()->text();
-                $result[] = trim(preg_replace('/\s+/', ' ', $title))
+                $logs[] = trim(preg_replace('/\s+/', ' ', $title))
                     . ' / ' . $rawParams[2]
                     . ' / ' . $response['points'] . 'P left'
                 ;
             }
         }
+        if (!empty($logs)) {
+            array_unshift($logs, ['Page: ' . $page . '/' . $pages]);
+        }
 
-        return $result;
+        return [
+            'continue' => $continue,
+            'logs'     => $logs,
+        ];
     }
 
     protected function getCrawlerByLink($client, $link)

@@ -4,6 +4,7 @@ namespace SGBot\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Parser;
@@ -18,6 +19,7 @@ class MainCommand extends Command
             ->setName('app:exec')
             ->setDescription('Run application')
             ->addArgument('config', InputArgument::REQUIRED)
+            ->addOption('force', 'f', InputOption::VALUE_NONE)
         ;
     }
 
@@ -39,7 +41,7 @@ class MainCommand extends Command
 
         $provider = new Provider($config);
         try {
-            $result = $provider->enterToGiveaways();
+            $result = $provider->enterToGiveaways($input->getOption('force'));
         } catch (\Exception $e) {
             $result = [$e->getMessage()];
         }
