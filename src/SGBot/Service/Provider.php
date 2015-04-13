@@ -55,7 +55,10 @@ class Provider
             );
         }
         if (intval(trim($points->first()->text())) < 5) {
-            throw new \Exception('You have not enough points to continue.');
+            return [
+                'continue' => false,
+                'logs'     => ['You have not enough points to continue.'],
+            ];
         }
 
         $links = array_filter($crawler
@@ -95,8 +98,8 @@ class Provider
                 ;
             }
         }
-        if (!empty($logs)) {
-            array_unshift($logs, ['Page: ' . $page . '/' . $pages]);
+        if ( ! empty($logs)) {
+            array_unshift($logs, 'Page: ' . $page . '/' . $pages);
         }
 
         return [
