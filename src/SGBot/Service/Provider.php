@@ -17,6 +17,7 @@ class Provider
     public function enterToGiveaways($fullScan = false)
     {
         $client = new Client('http://www.steamgifts.com');
+        $client->setUserAgent($this->config['userAgent']);
         $logs   = [];
         $page   = 1;
 
@@ -111,7 +112,7 @@ class Provider
     protected function getCrawlerByLink($client, $link)
     {
         $request = $client->get($link);
-        $this->fillHeaders($request);
+        $request->addCookie('PHPSESSID', $this->config['sessionId']);
         $response = $request->send();
         return new Crawler($response->getBody(true));
     }
@@ -119,17 +120,11 @@ class Provider
     protected function submitForm($client, $params)
     {
         $request = $client->post('/ajax.php', null, $params);
-        $this->fillHeaders($request);
+        $request->addCookie('PHPSESSID', $this->config['sessionId']);
         $response = $request->send();
         return ($response->getStatusCode()
             ? $response->json()
             : ['points' => 'NaN']
         );
-    }
-
-    protected function fillHeaders($request)
-    {
-        $request->addCookie('PHPSESSID', $this->config['sessionId']);
-        $request->addHeaders(['User-Agent' => $this->config['userAgent']]);
     }
 }
