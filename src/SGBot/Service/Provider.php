@@ -16,7 +16,7 @@ class Provider
 
     public function enterToGiveaways($fullScan = false)
     {
-        $client = new Client('http://www.steamgifts.com');
+        $client = new Client('https://www.steamgifts.com');
         $client->setUserAgent($this->config['userAgent']);
         $logs   = [];
         $page   = 1;
