@@ -5,7 +5,7 @@ namespace SGBot\Service;
 use Guzzle\Http\Client;
 use Symfony\Component\DomCrawler\Crawler;
 
-class Provider
+class SteamGifts
 {
     protected $config;
 

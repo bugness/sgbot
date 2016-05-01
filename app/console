@@ -8,8 +8,6 @@ use Symfony\Component\Console\Application;
 use SGBot\Command;
 
 $app = new Application('SGBot', '2.0');
-$app->addCommands([
-    new Command\MainCommand,
-    new Command\ReportCommand,
-]);
+$app->add(new Command\MainCommand);
+$app->setDefaultCommand('app:run');
 $app->run();

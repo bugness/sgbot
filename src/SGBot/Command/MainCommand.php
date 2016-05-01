@@ -9,14 +9,14 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Exception\ParseException;
-use SGBot\Service\Provider;
+use SGBot\Service\SteamGifts;
 
 class MainCommand extends Command
 {
     protected function configure()
     {
         $this
-            ->setName('app:exec')
+            ->setName('app:run')
             ->setDescription('Run application')
             ->addArgument('config', InputArgument::REQUIRED)
             ->addOption('force', 'f', InputOption::VALUE_NONE)
@@ -39,7 +39,7 @@ class MainCommand extends Command
             return;
         }
 
-        $provider = new Provider($config);
+        $provider = new SteamGifts($config);
         try {
             $result = $provider->enterToGiveaways($input->getOption('force'));
         } catch (\Exception $e) {
